@@ -2,8 +2,14 @@ plugins {
     kotlin("jvm") version "1.9.0"
     id("io.ktor.plugin") version "2.3.4"  // Plugin de Ktor
     kotlin("plugin.serialization") version "1.9.0"  // Para JSON
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
-
+kotlin {
+    jvmToolchain(17)
+}
+application {
+    mainClass.set("src/main/kotlin/Main.kt") // Reemplaza con tu clase principal
+}
 group = "org.example"
 version = "1.0-SNAPSHOT"
 

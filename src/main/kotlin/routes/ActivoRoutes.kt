@@ -17,18 +17,32 @@ fun Route.activoRoutes() {
             activo?.let { call.respond(it) }
                 ?: call.respondText("No encontrado", status = HttpStatusCode.NotFound)
         }
+
         // Ejemplo de otro endpoint: GET /activos/listar?farmacia={nombre}
-        // GET /activos/listar?farmacia={nombre}
         get("/listar") {
-            val farmacia = call.request.queryParameters["farmacia"]
-            // Aquí iría la lógica para filtrar por farmacia (implementa en Repository)
-            call.respondText("Listado de activos para $farmacia")
-//            val activos = if (farmacia != null) {
-//                repo.listarPorFarmacia(farmacia)
-//            } else {
-//                repo.listarTodos()
-//            }
-//            call.respond(activos)
+            try {
+                val filtro = call.request.queryParameters["nombre"]
+                    ?: return@get call.respond(
+                        HttpStatusCode.BadRequest,
+                        "Parámetro 'filtro' requerido (ej: /listar?filtro=NombreFarmacia)"
+                    )
+
+                val activos = repo.listarActivosFarmacia(filtro)
+
+                if (activos.isEmpty()) {
+                    call.respond(
+                        HttpStatusCode.NotFound,
+                        "No se encontraron activos para '$filtro'"
+                    )
+                } else {
+                    call.respond(activos)
+                }
+            } catch (e: Exception) {
+                call.respond(
+                    HttpStatusCode.InternalServerError,
+                    "Error al buscar activos: ${e.message}"
+                )
+            }
         }
     }
 }

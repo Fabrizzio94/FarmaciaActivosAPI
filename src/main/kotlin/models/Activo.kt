@@ -8,5 +8,5 @@ data class Activo(
     val activoFijo: String,
     val nombreActivo: String,
     val nombreCC: String,
-    val fechaAlta: String
+    val fechaAlta: String?
 )
