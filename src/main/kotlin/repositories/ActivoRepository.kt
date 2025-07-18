@@ -13,7 +13,7 @@ class ActivoRepository {
     suspend fun buscarPorActivoFijo(activoFijo: String): Activo? = withContext(Dispatchers.IO) {
         DriverManager.getConnection(jdbcUrl).use { conn ->
             val sql = """
-                SELECT [Activo fijo], [Nombre Activo], [NombreCC], [Fecha de Alta]
+                SELECT [Activo fijo], [Nombre Activo], [NombreCC], [Fecha de Alta], [Nombre Custodio]
                 FROM Activos
                 WHERE [Activo fijo] = ?
             """
@@ -25,7 +25,8 @@ class ActivoRepository {
                         rs.getString("Activo fijo"),
                         rs.getString("Nombre Activo"),
                         rs.getString("NombreCC"),
-                        rs.getString("Fecha de Alta")
+                        rs.getString("Fecha de Alta"),
+                        rs.getString("Nombre Custodio")
                     )
                 } else null
             }
@@ -34,7 +35,7 @@ class ActivoRepository {
     suspend fun listarActivosFarmacia(nombreFarmacia: String): List<Activo> = withContext(Dispatchers.IO){
         DriverManager.getConnection(jdbcUrl).use { conn ->
             val sql = """
-                SELECT [Activo fijo], [Nombre Activo], [NombreCC], NULLIF([Fecha de Alta], '') AS [Fecha de Alta]
+                SELECT [Activo fijo], [Nombre Activo], [NombreCC], NULLIF([Fecha de Alta], '') AS [Fecha de Alta], [Nombre Custodio]
                 FROM Activos
                 WHERE [NombreCC] LIKE ?
             """
@@ -48,7 +49,8 @@ class ActivoRepository {
                             rs.getString("Activo fijo"),
                             rs.getString("Nombre Activo"),
                             rs.getString("NombreCC"),
-                            rs.getStringOrNull("Fecha de Alta")
+                            rs.getStringOrNull("Fecha de Alta"),
+                            rs.getString("Nombre Custodio")
                         )
                     )
                 }
@@ -64,25 +66,4 @@ class ActivoRepository {
             null
         }
     }
-    // LISTAR TODOS LOS 20 PRIMEROS
-    /*suspend fun listarTodos(): List<Activo> = withContext(Dispatchers.IO) {
-        DriverManager.getConnection(jdbcUrl).use { conn ->
-            val sql = "SELECT TOP(20) [Activo fijo], [Nombre Activo], [NombreCC], [Fecha de Alta] FROM Activos"
-            conn.prepareStatement(sql).use { stmt ->
-                val rs = stmt.executeQuery()
-                val activos = mutableListOf<Activo>()
-                while (rs.next()) {
-                    activos.add(
-                        Activo(
-                            rs.getString("Activo fijo"),
-                            rs.getString("Nombre Activo"),
-                            rs.getString("NombreCC"),
-                            rs.getString("Fecha de Alta")
-                        )
-                    )
-                }
-                activos
-            }
-        }
-    }*/
 }
